@@ -58,7 +58,7 @@ py gbtdimg.py -d [example data key]
 |Key|Name|Width|Height|Result|
 |--|--|--|--|:--:|
 |t88|Heart|8|8|![](https://raw.githubusercontent.com/nichnet/GBTD-Image-Generator/main/export/Heart.png)|
-|t816|Sword|8|16|![](ttps://raw.githubusercontent.com/nichnet/GBTD-Image-Generator/main/export/Sword.png)|
+|t816|Sword|8|16|![](https://raw.githubusercontent.com/nichnet/GBTD-Image-Generator/main/export/Sword.png)|
 |t1616|Link|16|16|![](https://raw.githubusercontent.com/nichnet/GBTD-Image-Generator/main/export/Link.png)|
 |t3232|Red|32|32|![](https://raw.githubusercontent.com/nichnet/GBTD-Image-Generator/main/export/Red.png)|
 </br>
