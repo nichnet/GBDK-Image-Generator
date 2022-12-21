@@ -41,9 +41,36 @@ Every 8x8 pixels (16 bytes) is a `quadrant`.
 |16|16|256|8|
 |32|32|1024|16|
 
-The quadrants are organised like this:
+The quadrants are organised in the following order:
 
-![TODO]()
+</br>
+8x8 (1 quadrant)
+
+|0|
+|-|
+
+</br>
+8x16 (2 quadrants)
+
+|0|
+|-|
+|1|
+
+</br>
+16x16 (4 quadrants)
+
+|0|2|
+|-|-|
+|1|3|
+
+</br>
+32x32 (16 quadrants)
+
+|0|2|8|10|
+|-|-|-|-|
+|1|3|9|11|
+|4|6|12|14|
+|5|7|13|15|
 
 </br>
 
@@ -96,44 +123,12 @@ The image will be generated inside an `export` folder.
 </br>
 
 ## Issues and Concerns
-<i>Strangely</i>, the order that GBDK reads these quadrants is:
+<i>Strangely</i>, GBDK reads the quadrants (mentioned above) in an odd order.
 
-</br>
-8x8 (1 quadrant)
-
-|0|
-|-|
-
-</br>
-8x16 (2 quadrants)
-
-|0|
-|-|
-|1|
-
-</br>
-16x16 (4 quadrants)
-
-|0|2|
-|-|-|
-|1|3|
-
-</br>
-32x32 (16 quadrants)
-
-|0|2|8|10|
-|-|-|-|-|
-|1|3|9|11|
-|4|6|12|14|
-|5|7|13|15|
-
-</br>
 GBTD does have export compression options, so perhaps the ordering is related to that. 
 
-</br>
 Regardless, for easier interpretation, I would expect uncompressed data to be ordered horiztonally and then vertically like this:
 
-</br>
 </br>
 32x32 (16 quadrants)
 
@@ -143,7 +138,6 @@ Regardless, for easier interpretation, I would expect uncompressed data to be or
 |8|9|10|11|
 |12|13|14|15|
 
-</br>
 </br>
 
 As a result there is some [spaghetti code](https://github.com/nichnet/GBTD-Image-Generator/blob/main/encoder.py#L42) which organises the data appropriately for encoding and decoding until I research into this more.
