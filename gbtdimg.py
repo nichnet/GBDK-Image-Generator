@@ -27,24 +27,32 @@ if __name__ == "__main__":
                 data = example_data.t32_32["data"]
                 name = example_data.t32_32["name"]
         else:
-            data = a
-            name = 'Export'
-            if len(args) == 5:
-                name =  args[3]
-                fileName = args[4]
-                #TODO get data from file next arg is file..
-            elif len(args) > 5:
-                name =  args[3]
-                data = args[4:len(args)-1]
-    
-                print(data)
-        if data != None:
+            name = args[2]
+            if len(args) >= 4:
+                #this allows us to enter data such as (eg)
+                #0x6c,0x6c,0xfe,0x92,0xd6,0xaa,0xc6,0xba OR 
+                #0x6c, 0x6c, 0xfe, 0x92, 0xd6, 0xaa, 0xc6, 0xba, OR 
+                #0x6c 0x6c 0xfe 0x92 0xd6 0xaa 0xc6 0xba
+                raw = args[3:len(args)]
+                data = []
+                for o in raw:
+                    for h in o.split(','):
+                        try:
+                            data.append(int(h.strip(), 16))
+                        except:
+                            #invalid hex, eg a ''
+                            #ignore
+                            pass
+
+        if data == None:
+            print('No data to decode.') 
+        else:
+            pass
             print(f'Decoding data ({name}) and exporting as file: {constants.EXPORT_FOLDER}/{name}.png') 
             quads = encoder.generateQuadrants(data)
             ordered = encoder.sortQuadrants(quads)
             encoder.exportImage(name, ordered)
-        else:
-            print('No data to decode.') 
+
 
     elif mode == '-e':
         name = args[3]
@@ -60,7 +68,7 @@ if __name__ == "__main__":
 
             unsorted = decoder.sortQuadrantsForDecompile(out)
 
-            decoder.decoderexportCOutFIle(name, unsorted)
+            decoder.exportCOutFIle(name, unsorted)
             print(f'Exporting out files: {constants.EXPORT_FOLDER}/{name}.c & {constants.EXPORT_FOLDER}/{name}.h')
 
 

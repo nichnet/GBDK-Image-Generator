@@ -1,4 +1,4 @@
-EXPORT_FOLDER = 'gbtdimg-export'
+EXPORT_FOLDER = 'export'
 QUAD_SIZE = 8
 
 PALETTE = {
