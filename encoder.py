@@ -1,5 +1,6 @@
 from PIL import Image
 import constants
+import os
 
 def generateQuadrants(arr):
     quadrants = []
@@ -50,23 +51,24 @@ def sortQuadrants(quadrants):
     #to draw the image, they should be sorted like below. 
     #(unless youve got a better optimization, so that we can skip this step)
 
-    quadrantCnt = len(quads)
+    quadrantCnt = len(quadrants)
     ordered = []
 
+    print(quadrantCnt)
     if quadrantCnt == 1 or quadrantCnt == 2:
         # 8x8       8x16
         # 0         0
         #           1
-        ordered = quads #already sorted
+        ordered = quadrants #already sorted
     elif quadrantCnt == 4:
         # 16x16
         # 0  2 
         # 1  3
         ordered = [
-            quads[0],
-            quads[2],
-            quads[1],
-            quads[3]
+            quadrants[0],
+            quadrants[2],
+            quadrants[1],
+            quadrants[3]
         ]
     elif quadrantCnt == 16:
         # 32x32
@@ -75,56 +77,64 @@ def sortQuadrants(quadrants):
         # 4  6  12  14
         # 5  7  13  15
         ordered = [
-            quads[0],
-            quads[2],
-            quads[8],
-            quads[10],
-            quads[1],
-            quads[3],
-            quads[9],
-            quads[11],
-            quads[4],
-            quads[6],
-            quads[12],
-            quads[14],
-            quads[5],
-            quads[7],
-            quads[13],
-            quads[15]
+            quadrants[0],
+            quadrants[2],
+            quadrants[8],
+            quadrants[10],
+            quadrants[1],
+            quadrants[3],
+            quadrants[9],
+            quadrants[11],
+            quadrants[4],
+            quadrants[6],
+            quadrants[12],
+            quadrants[14],
+            quadrants[5],
+            quadrants[7],
+            quadrants[13],
+            quadrants[15]
         ]
 
     return ordered
 
-def exportImage(quadrants, name):
+def exportImage(name, quadrants):
     quadrantCnt = len(quadrants)
-    imgWidth  = constants.SPRITE_SIZES[quadrantCnt][0]
-    imgHeight = constants.SPRITE_SIZES[quadrantCnt][1]
-
+    try:
+        imgWidth  = constants.SPRITE_SIZES[quadrantCnt][0]
+        imgHeight = constants.SPRITE_SIZES[quadrantCnt][1]
+    except:
+        print(f'Size not supported. Quandrants: {quadrantCnt}')
+        return
     print(f'Image size: {imgWidth}x{imgHeight}, (quadrants: {quadrantCnt})')
 
-    quadrantHorizontalCnt = imgWidth / constants.QUAD_SIZE 
+    quadrantHorizontalCnt = int(imgWidth / constants.QUAD_SIZE)
 
     #create new image and pixel map
     img = Image.new('RGB', (imgWidth, imgHeight))
     pixels = img.load() 
     
     #generate pixels for each quadrant
-    for i in range(quadrantCnt):
+    for quadIndex in range(quadrantCnt):
         #quadrant coordinates
-        qx = int(i % quadrantHorizontalCnt) * constants.QUAD_SIZE
-        qy = int(i / quadrantHorizontalCnt) * constants.QUAD_SIZE
+        qx = int(quadIndex % quadrantHorizontalCnt) * constants.QUAD_SIZE
+        qy = int(quadIndex / quadrantHorizontalCnt) * constants.QUAD_SIZE
         
-        quadrant = quadrants[i]
+        quadrant = quadrants[quadIndex]
 
         #iterate each pixel in the quadrant
-        for j in range(len(quadrant)):
+        for pIndex in range(len(quadrant)):
             #every quadrant is made of 64 pixels (8x8)
             #get the pixel x and y
-            px = qx + int(j % 8)
-            py = qy + int(j / 8)
+            px = qx + int(pIndex % 8)
+            py = qy + int(pIndex / 8)
             #set the pixel color based on the index value in the palette.
-            pixelIndex = quadrant[j]
+            pixelIndex = quadrant[pIndex]
             pixels[px, py] = constants.PALETTE[pixelIndex] 
     
     #finally, save the image.
-    img.save(name + ".png")
+    try:
+        os.makedirs(constants.EXPORT_FOLDER)
+    except:# folder already most likely exists. fix your perms otherwise.
+        pass
+
+    img.save(f'{constants.EXPORT_FOLDER}/{name}.png')

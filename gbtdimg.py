@@ -1,140 +1,69 @@
-from PIL import Image
 import constants
-import os, sys
+import sys
+import example_data
+import decoder
+import encoder
 
-def generateQuadrants(arr):
-    quadrants = []
 
-    for i in range(0, len(arr), 16): 
-        quadrants.append(decodeQuadrant(arr[i:i+16]))
+if __name__ == "__main__":
+    args = sys.argv
+    mode = args[1]
+    path = args[2]
 
-    return quadrants
-
-def getColorPaletteIndexFromBits(b1, b2):
-    #0 0 W 000000000 0
-    #1 0 G 000000010 1
-    #0 1 D 000000001 2
-    #1 1 B 000000011 3
-
-    # Bitshift the bits of b2 to the left by 1. (00000001 << 1 = 00000010)
-    # Next, bitwise 'or' the new value of b2 with b1 (00000010 | 00000001 = 00000011)
-    # 
-    #this will result in 4 unique outputs for each color index.
-    return b2 << 1 | b1
-
-def decodeQuadrant(arr):
-    out = []
-
-    for i in range(0, len(arr), 2):
-        #each hex value represents 8 bits (and 8 pixels)
-        #get each byte and the byte after it
-        byte = format(arr[i], '08b') 
-        nextByte = format(arr[i+1], '08b') 
-        #for each bit in the byte, get the color index from it
-        #plus the bit in the same offset of the next byte. 
-        for x in range(len(byte)): #always going to be 8 (8 bits in hex (byte) and thus 8 pixels in the quad)..
-            p1 = int(byte[x])
-            p2 = int(nextByte[x])
-            out.append(getColorPaletteIndexFromBits(p1, p2))
-
-    return out
-
-def sortQuadrants(quadrants): 
-    #you'd expect them to be sorted like:
-    #  0   1   2   3
-    #  4   5   6   7
-    #  8   9  10  11
-    # 12  13  14  15
-    #
-    #Every 4 quads seems to be sorted vertically then horizontally.
-    #but every 2 x 4 quads are organized horizontally...
-    #to draw the image, they should be sorted like below. 
-    #(unless youve got a better optimization, so that we can skip this step)
-
-    quadrantCnt = len(quadrants)
-    ordered = []
-
-    print(quadrantCnt)
-    if quadrantCnt == 1 or quadrantCnt == 2:
-        # 8x8       8x16
-        # 0         0
-        #           1
-        ordered = quadrants #already sorted
-    elif quadrantCnt == 4:
-        # 16x16
-        # 0  2 
-        # 1  3
-        ordered = [
-            quadrants[0],
-            quadrants[2],
-            quadrants[1],
-            quadrants[3]
-        ]
-    elif quadrantCnt == 16:
-        # 32x32
-        # 0  2   8  10
-        # 1  3   9  11
-        # 4  6  12  14
-        # 5  7  13  15
-        ordered = [
-            quadrants[0],
-            quadrants[2],
-            quadrants[8],
-            quadrants[10],
-            quadrants[1],
-            quadrants[3],
-            quadrants[9],
-            quadrants[11],
-            quadrants[4],
-            quadrants[6],
-            quadrants[12],
-            quadrants[14],
-            quadrants[5],
-            quadrants[7],
-            quadrants[13],
-            quadrants[15]
-        ]
-
-    return ordered
-
-def exportImage(name, quadrants):
-    quadrantCnt = len(quadrants)
-    try:
-        imgWidth  = constants.SPRITE_SIZES[quadrantCnt][0]
-        imgHeight = constants.SPRITE_SIZES[quadrantCnt][1]
-    except:
-        print(f'Size not supported. Quandrants: {quadrantCnt}')
-        return
-    print(f'Image size: {imgWidth}x{imgHeight}, (quadrants: {quadrantCnt})')
-
-    quadrantHorizontalCnt = int(imgWidth / constants.QUAD_SIZE)
-
-    #create new image and pixel map
-    img = Image.new('RGB', (imgWidth, imgHeight))
-    pixels = img.load() 
+    name = ''
+    if mode == '-d':
+        data = None
+        if path in ['t88', 't816', 't1616', 't3232']: 
+            if path == 't88':
+                data = example_data.t8_8["data"]
+                name = example_data.t8_8["name"]
+            elif path == 't816':
+                data = example_data.t8_16["data"]
+                name = example_data.t8_16["name"]
+            elif path == 't1616':
+                data = example_data.t16_16["data"]
+                name = example_data.t16_16["name"]
+            elif path == 't3232':
+                data = example_data.t32_32["data"]
+                name = example_data.t32_32["name"]
+        else:
+            data = a
+            name = 'Export'
+            if len(args) == 5:
+                name =  args[3]
+                fileName = args[4]
+                #TODO get data from file next arg is file..
+            elif len(args) > 5:
+                name =  args[3]
+                data = args[4:len(args)-1]
     
-    #generate pixels for each quadrant
-    for quadIndex in range(quadrantCnt):
-        #quadrant coordinates
-        qx = int(quadIndex % quadrantHorizontalCnt) * constants.QUAD_SIZE
-        qy = int(quadIndex / quadrantHorizontalCnt) * constants.QUAD_SIZE
-        
-        quadrant = quadrants[quadIndex]
+                print(data)
+        if data != None:
+            print(f'Decoding data ({name}) and exporting as file: {constants.EXPORT_FOLDER}/{name}.png') 
+            quads = encoder.generateQuadrants(data)
+            ordered = encoder.sortQuadrants(quads)
+            encoder.exportImage(name, ordered)
+        else:
+            print('No data to decode.') 
 
-        #iterate each pixel in the quadrant
-        for pIndex in range(len(quadrant)):
-            #every quadrant is made of 64 pixels (8x8)
-            #get the pixel x and y
-            px = qx + int(pIndex % 8)
-            py = qy + int(pIndex / 8)
-            #set the pixel color based on the index value in the palette.
-            pixelIndex = quadrant[pIndex]
-            pixels[px, py] = constants.PALETTE[pixelIndex] 
-    
-    #finally, save the image.
-    try:
-        os.makedirs(constants.EXPORT_FOLDER)
-    except:# folder already most likely exists. fix your perms otherwise.
-        pass
+    elif mode == '-e':
+        name = args[3]
+        print(f'Decoding example image ({name})')
 
-    img.save(f'{constants.EXPORT_FOLDER}/{name}.png')
+        if path and name:
+            arr = decoder.decompileImageFile(path)
+
+            out = []
+
+            for i in range(0, len(arr), 16):
+                out.append(arr[i:i+16])
+
+            unsorted = decoder.sortQuadrantsForDecompile(out)
+
+            decoder.decoderexportCOutFIle(name, unsorted)
+            print(f'Exporting out files: {constants.EXPORT_FOLDER}/{name}.c & {constants.EXPORT_FOLDER}/{name}.h')
+
+
+            
+
+

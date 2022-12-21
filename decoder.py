@@ -1,15 +1,6 @@
-import sys
-import os
-import example_data
-import gbtdimg
-
-import math
-import constants
 from PIL import Image
+import constants
 
-
-def generateQuadrantFromPixels(pixels):
-    pass
 
 def getColorIndexFromPixelColor(color):
     return [key for key, value in constants.PALETTE.items() if value == color][0]
@@ -49,32 +40,6 @@ def importImage(path):
 
     return out
 
-#    for j in range(len(quadrant)):
-        #every quadrant is made of 64 pixels (8x8)
-        #get the pixel x and y
- 
-
-#    quadrantHorizontalCnt = int(imgWidth / constants.QUAD_SIZE)
-
-
-#    qx = int(i % quadrantHorizontalCnt) * constants.QUAD_SIZE
-#    qy = int(i / quadrantHorizontalCnt) * constants.QUAD_SIZE
-    
- #   print(quadrantHorizontalCnt, imgWidth, imgHeight)#, qx, qy)
-
-#    quadrant = quadrants[i]
-#
-#    #iterate each pixel in the quadrant
-#   
-#
-    
-    for y in range(imgHeight, 8):
-        for x in range(0, 8):  
-            colorIndex = getColorIndexFromPixelColor(pixels[x, y])
-            out.append(colorIndex)
-
-    return out
-
 def twoBytesToTwoHex(bytes):
     h1 = 0
     h2 = 0
@@ -85,7 +50,6 @@ def twoBytesToTwoHex(bytes):
 
         h1 <<= 1
         h1 |= b1
-
 
         h2 <<= 1
         h2 |= b2
@@ -156,7 +120,6 @@ def sortQuadrantsForDecompile(quadrants):
     return unordered
 
 
-
 def generateOutFileInfo(width, height): #TODO other info here.. unneccessary for now.
     return '\n'.join(
         [
@@ -175,7 +138,6 @@ def generateOutFileInfo(width, height): #TODO other info here.. unneccessary for
             'Convert to metatiles : No.'
         ]
     )
-
 
 def generateCHeaderContent(label, width, height):
     return '\n'.join(
@@ -196,7 +158,6 @@ def generateCHeaderContent(label, width, height):
             f'/* End of {label}.H */',
         ]
     )
-
 
 def generateCSourceContent(label, data, width, height):
     dataStr = ''
@@ -228,7 +189,6 @@ def generateCSourceContent(label, data, width, height):
         ]
     )
 
-
 def exportCOutFIle(label, data):
     sourceFile = open(f'{constants.EXPORT_FOLDER}/{label}.c', 'w')
     sourceFile.write(generateCSourceContent(label, data, 8, 8))
@@ -237,69 +197,3 @@ def exportCOutFIle(label, data):
     headerFile = open(f'{constants.EXPORT_FOLDER}/{label}.h', 'w')
     headerFile.write(generateCHeaderContent(label, 8, 8))
     headerFile.close()
-
-if __name__ == "__main__":
-    args = sys.argv
-    mode = args[1]
-    path = args[2]
-
-    name = ''
-    if mode == '-d':
-        data = None
-        if path in ['t88', 't816', 't1616', 't3232']: 
-            if path == 't88':
-                data = example_data.t8_8["data"]
-                name = example_data.t8_8["name"]
-            elif path == 't816':
-                data = example_data.t8_16["data"]
-                name = example_data.t8_16["name"]
-            elif path == 't1616':
-                data = example_data.t16_16["data"]
-                name = example_data.t16_16["name"]
-            elif path == 't3232':
-                data = example_data.t32_32["data"]
-                name = example_data.t32_32["name"]
-        else:
-            data = a
-            name = 'Export'
-            if len(args) == 5:
-                name =  args[3]
-                fileName = args[4]
-                #TODO get data from file next arg is file..
-            elif len(args) > 5:
-                name =  args[3]
-                data = args[4:len(args)-1]
-    
-                print(data)
-        if data != None:
-            print(f'Decoding data ({name}) and exporting as file: {constants.EXPORT_FOLDER}/{name}.png') 
-            quads = gbtdimg.generateQuadrants(data)
-            ordered = gbtdimg.sortQuadrants(quads)
-            gbtdimg.exportImage(name, ordered)
-        else:
-            print('No data to decode.') 
-
-    elif mode == '-e':
-        name = args[3]
-        print(f'Decoding example image ({name})')
-
-        if path and name:
-            arr = decompileImageFile(path)
-
-
-            out = []
-
-
-            for i in range(0, len(arr), 16):
-                out.append(arr[i:i+16])
-
-            aa = sortQuadrantsForDecompile(out)
-
-
-            exportCOutFIle(name, aa)
-            print(f'Exporting out files: {constants.EXPORT_FOLDER}/{name}.c & {constants.EXPORT_FOLDER}/{name}.h')
-
-
-            
-
-
