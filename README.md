@@ -32,13 +32,13 @@ For example the data array may contain: `0xBE, 0xD2,...`, which in binary and fi
 As mentioned above, this is <u>a single row of 8 pixels</u> and in this case, the colors are <i>`black, dark, light, black, etc...`</i> (in a standard GameBoy color palette).
 
 </br> 
-Every 8x8 pixels (16 bytes) is a `quadrant`. 
+Every 8x8 pixels (16 bytes) is a `quadrant` .
 
 |Width|Height|Pixels|Quadrants|
 |:--:|:--:|:--:|:--:|
 |8|8|64|1|
 |8|16|128|2|
-|16|16|256|8|
+|16|16|256|4|
 |32|32|1024|16|
 
 </br>
