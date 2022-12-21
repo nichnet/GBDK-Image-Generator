@@ -107,9 +107,9 @@ The image will be generated inside an `export` folder.
 </br>
 8x16 (2 quadrants)
 
-|0|2|
-|-|-|
-|1|3|
+|0|
+|-|
+|1|
 
 </br>
 16x16 (4 quadrants)
@@ -131,9 +131,9 @@ The image will be generated inside an `export` folder.
 GBTD does have export compression options, so perhaps the ordering is related to that. 
 
 </br>
-</br>
 Regardless, for easier interpretation, I would expect uncompressed data to be ordered horiztonally and then vertically like this:
 
+</br>
 </br>
 32x32 (16 quadrants)
 
@@ -143,6 +143,7 @@ Regardless, for easier interpretation, I would expect uncompressed data to be or
 |8|9|10|11|
 |12|13|14|15|
 
+</br>
 </br>
 
 As a result there is some [spaghetti code](https://github.com/nichnet/GBTD-Image-Generator/blob/main/encoder.py#L42) which organises the data appropriately for encoding and decoding until I research into this more.
