@@ -41,6 +41,8 @@ Every 8x8 pixels (16 bytes) is a `quadrant`.
 |16|16|256|8|
 |32|32|1024|16|
 
+</br>
+
 The quadrants are organised in the following order:
 
 </br>
