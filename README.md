@@ -65,14 +65,14 @@ py gbtdimg.py -d [example data key]
 
 ### Encoding Images as Hexidecimal Data
 
-<b>Images to encode should only be 8x8, 8x16, 16x16, or 32x32, and contain the RGB values mentioned previously above.</b>
+<b>Images to encode should only be 8x8, 8x16, 16x16, or 32x32 in size, and contain the RGB values mentioned previously above.</b>
 
 ```python
 py gbtdimg.py -e [image path] [label name] 
 #py gbtdimg.py -e path/to/heart.png MyHeartLabel 
 ```
 
-The result is a C source and header file containging the hex data, e.g.:
+The result is a C source and header file containing the hex data, e.g.:
 
 ```
 0x6C,0x6C,0xFE,0x92,0xD6,0xAA,0xC6,0xBA,
@@ -96,7 +96,7 @@ The image will be generated inside an `export` folder.
 </br>
 
 ## Issues and Concerns
-<i>Strangely</i>, the order that GBDK reads these quadrants is:
+<i>Strangely</i>, the order that GBDK reads the sprite quadrants is:
 
 ![TODO]()
 
