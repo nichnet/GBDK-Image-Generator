@@ -112,4 +112,10 @@ As a result there is some [spaghetti code](https://github.com/nichnet/GBTD-Image
 
 </br>
 
-## Licensing
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+<br/>
+
+## License
+[GNU General Public License v3.0](https://choosealicense.com/licenses/gpl-3.0/)
